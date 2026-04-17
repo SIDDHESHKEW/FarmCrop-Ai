@@ -2,6 +2,15 @@ import { MapPin, Search } from "lucide-react";
 import { REGIONS, type Region } from "@/lib/futurecrop-data";
 import { useState } from "react";
 
+export type CustomRegionInput = {
+  name: string;
+  temperature: string;
+  rainfall: string;
+  soil: string;
+};
+
+export type RegionInputData = Region | CustomRegionInput;
+
 export function StepRegion({
   selected,
   onSelect,
@@ -9,14 +18,48 @@ export function StepRegion({
 }: {
   selected: Region | null;
   onSelect: (r: Region) => void;
-  onNext: (r: Region) => void;
+  onNext: (r: RegionInputData) => void;
 }) {
   const [q, setQ] = useState("");
+  const [customName, setCustomName] = useState("");
+  const [customTemperature, setCustomTemperature] = useState("");
+  const [customRainfall, setCustomRainfall] = useState("");
+  const [customSoil, setCustomSoil] = useState("");
+
   const filtered = REGIONS.filter(
     (r) =>
       r.name.toLowerCase().includes(q.toLowerCase()) ||
       r.country.toLowerCase().includes(q.toLowerCase()),
   );
+
+  const customMode = customName.trim().length > 0;
+  const displayName = customMode ? customName.trim() : (selected?.name ?? "");
+  const displayTemperature = customMode ? customTemperature.trim() : (selected?.temperature ?? "--");
+  const displayRainfall = customMode ? customRainfall.trim() : (selected?.rainfall ?? "--");
+  const displaySoil = customMode ? customSoil.trim() : (selected?.soil ?? "--");
+  const mapQueryRaw = customMode
+    ? displayName
+    : `${selected?.name ?? ""} ${selected?.country ?? ""}`.trim();
+  const mapQuery = encodeURIComponent(mapQueryRaw || "India");
+
+  const handleNext = () => {
+    if (customMode) {
+      onNext({
+        name: customName.trim(),
+        temperature: customTemperature.trim() || "--",
+        rainfall: customRainfall.trim() || "--",
+        soil: customSoil.trim() || "--",
+      });
+      return;
+    }
+
+    if (selected) {
+      onNext(selected);
+      return;
+    }
+
+    alert("Please select or enter a region");
+  };
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -89,21 +132,61 @@ export function StepRegion({
             );
           })}
         </div>
+
+        <div className="mt-6 rounded-2xl border border-hairline bg-panel/30 p-4">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground">Custom region</div>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <input
+              value={customName}
+              onChange={(e) => setCustomName(e.target.value)}
+              placeholder="Location Name"
+              className="rounded-xl border border-hairline bg-panel/40 px-3 py-2 text-sm outline-none focus:border-primary/50"
+            />
+            <input
+              value={customTemperature}
+              onChange={(e) => setCustomTemperature(e.target.value)}
+              placeholder="Temperature (°C)"
+              className="rounded-xl border border-hairline bg-panel/40 px-3 py-2 text-sm outline-none focus:border-primary/50"
+            />
+            <input
+              value={customRainfall}
+              onChange={(e) => setCustomRainfall(e.target.value)}
+              placeholder="Rainfall (mm)"
+              className="rounded-xl border border-hairline bg-panel/40 px-3 py-2 text-sm outline-none focus:border-primary/50"
+            />
+            <input
+              value={customSoil}
+              onChange={(e) => setCustomSoil(e.target.value)}
+              placeholder="Soil Type"
+              className="rounded-xl border border-hairline bg-panel/40 px-3 py-2 text-sm outline-none focus:border-primary/50"
+            />
+          </div>
+        </div>
       </div>
 
       <div className="glass rounded-3xl p-6 animate-fade-in">
         <div className="text-xs uppercase tracking-wider text-muted-foreground">Selection</div>
-        {selected ? (
+        {displayName ? (
           <>
-            <div className="mt-2 text-lg font-semibold">{selected.name}</div>
-            <div className="text-sm text-muted-foreground">{selected.country}</div>
-            <MiniMap region={selected} />
+            <div className="mt-2 text-lg font-semibold">{displayName}</div>
+            <div className="text-sm text-muted-foreground">
+              {customMode ? "Custom region" : selected?.country}
+            </div>
+            {!customMode && selected ? <MiniMap region={selected} /> : null}
+            <div className="mt-4 overflow-hidden rounded-2xl border border-hairline bg-background/50">
+              <iframe
+                title={`${displayName} map`}
+                src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
+                className="h-40 w-full"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
             <dl className="mt-5 space-y-3 text-sm">
               {[
-                ["Latitude", `${selected.lat.toFixed(2)}°`],
-                ["Longitude", `${selected.lon.toFixed(2)}°`],
-                ["Coverage", selected.area],
-                ["Primary staple", selected.staple],
+                ["Temperature", displayTemperature || "--"],
+                ["Rainfall", displayRainfall || "--"],
+                ["Soil", displaySoil || "--"],
                 ["Layers ready", "Climate · Soil · Genotype"],
               ].map(([k, v]) => (
                 <div key={k} className="flex justify-between border-b border-hairline pb-2">
@@ -113,7 +196,7 @@ export function StepRegion({
               ))}
             </dl>
             <button
-              onClick={() => onNext(selected)}
+              onClick={handleNext}
               className="mt-6 w-full rounded-xl bg-primary py-2.5 text-sm font-medium text-primary-foreground neon-glow transition-transform hover:scale-[1.01]"
             >
               Continue to scenario →

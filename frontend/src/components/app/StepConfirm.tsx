@@ -21,7 +21,7 @@ export function StepConfirm({
 }) {
   const [signed, setSigned] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  const txid = `0x${(region.id + scenario.ssp + genotype.id)
+  const txid = `0x${(region.id + scenario.name + genotype.id)
     .split("")
     .reduce((a, c) => a + c.charCodeAt(0), 0)
     .toString(16)
@@ -47,7 +47,7 @@ export function StepConfirm({
         },
         body: JSON.stringify({
           region: region.name,
-          scenario: scenario.ssp,
+          scenario: scenario.name,
           predictions: requestPredictions,
         }),
       });
@@ -60,7 +60,7 @@ export function StepConfirm({
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `blueprint_${toFileSafe(region.name)}_${toFileSafe(scenario.ssp)}.pdf`;
+      anchor.download = `blueprint_${toFileSafe(region.name)}_${toFileSafe(scenario.name)}.pdf`;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
@@ -83,7 +83,7 @@ export function StepConfirm({
         <div className="border-b border-hairline px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="text-xs uppercase tracking-wider text-muted-foreground">
-              Step 06 · Confirm
+              Step 07 · Confirm
             </div>
             <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
               <ShieldCheck className="h-3.5 w-3.5 text-primary" />
@@ -114,8 +114,8 @@ export function StepConfirm({
               </div>
 
               <div className="rounded-2xl border border-hairline bg-panel/40 p-5">
-                <Row k="Scenario" v={`${scenario.ssp} · ${scenario.year}`} />
-                <Row k="Forcing" v={`+${scenario.warming.toFixed(1)} °C · ${scenario.co2} ppm`} />
+                <Row k="Scenario" v={`${scenario.name} · ${scenario.year}`} />
+                <Row k="Forcing" v={`+${scenario.temperatureDelta.toFixed(1)} °C · ${scenario.rainfallChange.toFixed(0)}% rain · ${scenario.co2} ppm`} />
                 <Row k="Recommended genotype" v={genotype.id} mono />
                 <Row k="Trait" v={genotype.trait} />
                 <Row k="Expected yield" v={`${genotype.yield.toFixed(2)} t/ha`} accent="primary" />

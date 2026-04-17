@@ -21,10 +21,12 @@ export function StepSimulate({
   onDone,
   region,
   scenario,
+  crop,
 }: {
   onDone: (predictions: PredictionItem[]) => void;
   region: string;
   scenario: string;
+  crop: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,6 +38,7 @@ export function StepSimulate({
 
     console.log("REGION:", region);
     console.log("SCENARIO:", scenario);
+    console.log("CROP:", crop);
 
     if (!region || !scenario || genotypes.length === 0) {
       alert("Please select region and scenario first");
@@ -73,6 +76,7 @@ export function StepSimulate({
       const requestBody = {
         region,
         scenario,
+        crop,
         genotypes,
       };
 
@@ -117,7 +121,7 @@ export function StepSimulate({
         />
         <div className="relative">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">
-            Step 03 · Inference
+            Step 04 · Inference
           </div>
           <h2 className="mt-1 text-2xl font-semibold tracking-tight">
             Running CropOracle simulation

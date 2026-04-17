@@ -2,8 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { Stepper, type StepKey } from "@/components/app/Stepper";
-import { StepRegion } from "@/components/app/StepRegion";
+import { StepRegion, type RegionInputData } from "@/components/app/StepRegion";
 import { StepScenario } from "@/components/app/StepScenario";
+import { StepCrop } from "@/components/app/StepCrop";
 import { StepSimulate } from "@/components/app/StepSimulate";
 import { StepResults, type Genotype } from "@/components/app/StepResults";
 import { StepAnalysis } from "@/components/app/StepAnalysis";
@@ -35,8 +36,13 @@ function AppConsole() {
   const [step, setStep] = useState<StepKey>("region");
   const [region, setRegion] = useState<Region | null>(REGIONS[0]);
   const [scenario, setScenario] = useState<Scenario>({
-    ssp: "SSP2-4.5", year: 2050, warming: 2.7, co2: 603,
+    name: "Moderate Climate Change",
+    year: 2050,
+    temperatureDelta: 2.5,
+    rainfallChange: -10,
+    co2: 520,
   });
+  const [crop, setCrop] = useState<string>("Wheat");
   const [genotype, setGenotype] = useState<Genotype | null>(null);
   const [predictions, setPredictions] = useState<PredictionItem[]>([]);
   const bestGenotype = predictions.length
@@ -55,6 +61,26 @@ function AppConsole() {
       setPredictions(nextPredictions);
     }
     setStep("results");
+  };
+
+  const toRegion = (value: RegionInputData): Region => {
+    if ("id" in value) {
+      return value;
+    }
+
+    const key = value.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-") || "custom-region";
+    return {
+      id: `custom-${key}`,
+      name: value.name,
+      country: "Custom",
+      lat: 0,
+      lon: 0,
+      area: "Custom",
+      staple: "Mixed",
+      temperature: value.temperature,
+      rainfall: value.rainfall,
+      soil: value.soil,
+    };
   };
 
   return (
@@ -113,7 +139,7 @@ function AppConsole() {
             selected={region}
             onSelect={setRegion}
             onNext={(nextRegion) => {
-              setRegion(nextRegion);
+              setRegion(toRegion(nextRegion));
               setStep("scenario");
             }}
           />
@@ -125,6 +151,15 @@ function AppConsole() {
             onBack={() => setStep("region")}
             onNext={(nextScenario) => {
               setScenario(nextScenario);
+              setStep("crop");
+            }}
+          />
+        )}
+        {step === "crop" && (
+          <StepCrop
+            crop={crop}
+            onNext={(selectedCrop) => {
+              setCrop(selectedCrop);
               setStep("simulate");
             }}
           />
@@ -133,7 +168,8 @@ function AppConsole() {
           <StepSimulate
             onDone={handleSimulationDone}
             region={region.name}
-            scenario={scenario.ssp}
+            scenario={scenario.name}
+            crop={crop}
           />
         )}
         {step === "results" && region && (

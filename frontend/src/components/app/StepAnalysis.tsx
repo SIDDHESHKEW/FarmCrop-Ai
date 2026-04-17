@@ -151,7 +151,7 @@ export function StepAnalysis({
         <div className="flex items-start justify-between">
           <div>
             <div className="text-xs uppercase tracking-wider text-muted-foreground">
-              Step 05 · Deep analysis
+              Step 06 · Deep analysis
             </div>
             <h2 className="mt-1 text-2xl font-semibold tracking-tight">
               <span className="font-mono text-primary">{genotype.id}</span> · {genotype.name}

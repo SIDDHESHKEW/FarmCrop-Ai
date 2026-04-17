@@ -6,11 +6,26 @@ export type Region = {
   lon: number;
   area: string;
   staple: string;
+  temperature?: string;
+  rainfall?: string;
+  soil?: string;
 };
 
 export const REGIONS: Region[] = [
   { id: "iowa", name: "Iowa Belt", country: "United States", lat: 41.9, lon: -93.0, area: "145,000 km²", staple: "Maize" },
   { id: "punjab", name: "Punjab Plains", country: "India / Pakistan", lat: 31.1, lon: 75.3, area: "50,400 km²", staple: "Wheat" },
+  {
+    id: "nagpur",
+    name: "Nagpur",
+    country: "India",
+    lat: 21.1,
+    lon: 79.1,
+    area: "218 km²",
+    staple: "Cotton / Orange",
+    temperature: "28-42°C",
+    rainfall: "1000 mm",
+    soil: "Black soil",
+  },
   { id: "saopaulo", name: "São Paulo Cerrado", country: "Brazil", lat: -22.0, lon: -47.5, area: "2.04M km²", staple: "Soybean" },
   { id: "nile", name: "Nile Delta", country: "Egypt", lat: 30.8, lon: 31.0, area: "24,000 km²", staple: "Rice / Cotton" },
   { id: "sahel", name: "Sahel Corridor", country: "West Africa", lat: 14.0, lon: 0.0, area: "3.05M km²", staple: "Sorghum / Millet" },
@@ -20,8 +35,9 @@ export const REGIONS: Region[] = [
 ];
 
 export type Scenario = {
-  ssp: "SSP1-1.9" | "SSP2-4.5" | "SSP3-7.0" | "SSP5-8.5";
+  name: "Extreme Heat Future" | "Moderate Climate Change" | "Sustainable Future" | "Custom Scenario";
   year: number;
-  warming: number; // °C
+  temperatureDelta: number; // °C
+  rainfallChange: number; // %
   co2: number; // ppm
 };

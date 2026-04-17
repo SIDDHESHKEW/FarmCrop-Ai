@@ -75,13 +75,13 @@ export function StepResults({
           <div className="flex items-start justify-between">
             <div>
               <div className="text-xs uppercase tracking-wider text-muted-foreground">
-                Step 04 · Results
+                Step 05 · Results
               </div>
               <h2 className="mt-1 text-2xl font-semibold tracking-tight">
                 {region.name} · {scenario.year}
               </h2>
               <p className="text-sm text-muted-foreground">
-                {scenario.ssp} · +{scenario.warming.toFixed(1)} °C · {scenario.co2} ppm
+                {scenario.name} · +{scenario.temperatureDelta.toFixed(1)} °C · {scenario.rainfallChange.toFixed(0)}% rain · {scenario.co2} ppm
               </p>
             </div>
           </div>
@@ -112,13 +112,13 @@ export function StepResults({
         <div className="flex items-start justify-between">
           <div>
             <div className="text-xs uppercase tracking-wider text-muted-foreground">
-              Step 04 · Results
+              Step 05 · Results
             </div>
             <h2 className="mt-1 text-2xl font-semibold tracking-tight">
               {region.name} · {scenario.year}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {scenario.ssp} · +{scenario.warming.toFixed(1)} °C · {scenario.co2} ppm
+              {scenario.name} · +{scenario.temperatureDelta.toFixed(1)} °C · {scenario.rainfallChange.toFixed(0)}% rain · {scenario.co2} ppm
             </p>
           </div>
           <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-medium text-primary">

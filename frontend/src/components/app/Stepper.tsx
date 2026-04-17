@@ -3,6 +3,7 @@ import { Check } from "lucide-react";
 export type StepKey =
   | "region"
   | "scenario"
+  | "crop"
   | "simulate"
   | "results"
   | "analysis"
@@ -11,10 +12,11 @@ export type StepKey =
 export const STEPS: { key: StepKey; label: string; index: number }[] = [
   { key: "region", label: "Region", index: 1 },
   { key: "scenario", label: "Scenario", index: 2 },
-  { key: "simulate", label: "Simulate", index: 3 },
-  { key: "results", label: "Results", index: 4 },
-  { key: "analysis", label: "Analysis", index: 5 },
-  { key: "confirm", label: "Confirm", index: 6 },
+  { key: "crop", label: "Crop", index: 3 },
+  { key: "simulate", label: "Simulate", index: 4 },
+  { key: "results", label: "Results", index: 5 },
+  { key: "analysis", label: "Analysis", index: 6 },
+  { key: "confirm", label: "Confirm", index: 7 },
 ];
 
 export function Stepper({ current }: { current: StepKey }) {
