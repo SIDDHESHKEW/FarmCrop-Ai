@@ -37,3 +37,6 @@ If you run from backend folder directly, use:
 $body = @{ region = 'Punjab'; scenario = 'RCP_8.5'; genotypes = @('G-101','G-102') } | ConvertTo-Json
 Invoke-RestMethod -Uri 'http://127.0.0.1:8000/predict' -Method Post -ContentType 'application/json' -Body $body | ConvertTo-Json -Depth 5
 ```
+
+look this commit
+
