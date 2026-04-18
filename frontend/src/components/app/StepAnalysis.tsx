@@ -1,5 +1,6 @@
 import type { Genotype } from "./StepResults";
 import { useEffect, useMemo, useState } from "react";
+import { apiUrl } from "@/lib/api";
 import {
   Bar, BarChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis,
   Radar, RadarChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
@@ -54,7 +55,7 @@ export function StepAnalysis({
     setError(null);
 
     try {
-      const res = await fetch(`http://127.0.0.1:8000/shap/${encodeURIComponent(genotypeId)}`);
+      const res = await fetch(apiUrl(`/shap/${encodeURIComponent(genotypeId)}`));
       if (!res.ok) {
         throw new Error(`SHAP request failed with status ${res.status}`);
       }

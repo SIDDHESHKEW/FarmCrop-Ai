@@ -12,8 +12,9 @@ FarmerCrop AI is a full-stack climate simulation and recommendation platform tha
 6. Running the Application
 7. API Endpoints
 8. PDF Generation Details
-9. Troubleshooting
-10. Development Notes
+9. Deploy on Render (Button-by-Button)
+10. Troubleshooting
+11. Development Notes
 
 ## 1) Overview
 
@@ -187,6 +188,93 @@ Current implementation includes fallback resolution for `wkhtmltopdf` on Windows
 
 ## 9) Troubleshooting
 
+## 9) Deploy on Render (Button-by-Button)
+
+This repository is now prepared for Render deployment with:
+
+- `backend/Dockerfile` (installs `wkhtmltopdf`)
+- `backend/requirements.txt`
+- `frontend/.env.example`
+- frontend API URLs moved to `VITE_API_BASE_URL`
+
+Deploy backend first, then frontend.
+
+### 9.1 Backend deployment (Render Web Service)
+
+1. Open Render Dashboard.
+2. Click `New +`.
+3. Click `Web Service`.
+4. Select `Build and deploy from a Git repository`.
+5. Click `Connect` on your GitHub account (if not connected).
+6. Select repo: `SIDDHESHKEW/Men-in-black_SKB-F11_SBK-P3`.
+7. Fill service form:
+	- Name: `farmercrop-backend` (or your preferred name)
+	- Region: nearest to you
+	- Branch: `main`
+	- Root Directory: leave empty
+	- Runtime: `Docker`
+	- Dockerfile Path: `backend/Dockerfile`
+	- Instance Type: `Free`
+8. Click `Create Web Service`.
+9. Wait for deploy to complete.
+10. Open generated backend URL and verify:
+	 - `https://YOUR-BACKEND.onrender.com/docs`
+
+### 9.2 Frontend deployment (Render Static Site)
+
+1. Back in Render Dashboard, click `New +`.
+2. Click `Static Site`.
+3. Select same repository: `SIDDHESHKEW/Men-in-black_SKB-F11_SBK-P3`.
+4. Fill site form:
+	- Name: `farmercrop-frontend`
+	- Branch: `main`
+	- Root Directory: `frontend`
+	- Build Command: `npm ci && npm run build`
+	- Publish Directory: `dist/client`
+5. In `Environment Variables`, click `Add Environment Variable`:
+	- Key: `VITE_API_BASE_URL`
+	- Value: `https://YOUR-BACKEND.onrender.com`
+6. Click `Create Static Site`.
+
+### 9.3 Add SPA rewrite rule (important)
+
+After static site is created:
+
+1. Open frontend service in Render.
+2. Click `Settings` tab.
+3. Scroll to `Redirects and Rewrites`.
+4. Click `Add Rule`.
+5. Set:
+	- Source: `/*`
+	- Destination: `/index.html`
+	- Action: `Rewrite`
+6. Save changes.
+
+### 9.4 Redeploy after env/rule changes
+
+1. Open frontend service.
+2. Click `Manual Deploy`.
+3. Click `Deploy latest commit`.
+
+### 9.5 Final production verification
+
+1. Open frontend URL from Render.
+2. Run full app flow:
+	- Region selection
+	- Climate setup
+	- Crop detect/predict
+	- SHAP analysis
+	- Download PDF
+3. Confirm PDF downloads successfully.
+
+If PDF fails in production:
+
+1. Open backend service logs in Render.
+2. Check for `wkhtmltopdf` related errors.
+3. Ensure backend is deployed from `backend/Dockerfile` (not plain Python runtime).
+
+## 10) Troubleshooting
+
 ### 9.1 "Failed to download PDF"
 
 Check backend logs first. Most common cause is missing `wkhtmltopdf`.
@@ -208,7 +296,7 @@ If not found, install it with winget (see setup section), then restart backend.
 
 Confirm request `Content-Type` is `application/json` and field names match endpoint schema exactly.
 
-## 10) Development Notes
+## 11) Development Notes
 
 - Backend and frontend are developed together from this repo root.
 - For backend-only notes, see `backend/readme-b.md`.

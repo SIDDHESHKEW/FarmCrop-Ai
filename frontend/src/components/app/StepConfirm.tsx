@@ -2,6 +2,7 @@ import type { Region, Scenario } from "@/lib/futurecrop-data";
 import type { Genotype } from "./StepResults";
 import { Check, Download, FileText, ShieldCheck } from "lucide-react";
 import { useState } from "react";
+import { apiUrl } from "@/lib/api";
 
 type PredictionItem = {
   id: string;
@@ -50,7 +51,7 @@ export function StepConfirm({
         { name: "Soil Efficiency", impact: 0.25 },
       ];
 
-      const response = await fetch("http://127.0.0.1:8000/generate-pdf", {
+      const response = await fetch(apiUrl("/generate-pdf"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

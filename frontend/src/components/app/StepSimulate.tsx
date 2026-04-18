@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Cpu, Database, Atom, Brain, Check } from "lucide-react";
+import { apiUrl } from "@/lib/api";
 
 type PredictionItem = {
   id: string;
@@ -112,7 +113,7 @@ export function StepSimulate({
 
       console.log("PREDICT REQUEST BODY:", requestBody);
 
-      const res = await fetch("http://127.0.0.1:8000/predict", {
+      const res = await fetch(apiUrl("/predict"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

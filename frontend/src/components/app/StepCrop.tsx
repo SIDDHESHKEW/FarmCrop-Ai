@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { apiUrl } from "@/lib/api";
 
 const CROP_OPTIONS = ["Wheat", "Rice", "Maize", "Cotton", "Bajra"];
 
@@ -88,7 +89,7 @@ export function StepCrop({
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch("http://127.0.0.1:8000/detect-crop", {
+      const res = await fetch(apiUrl("/detect-crop"), {
         method: "POST",
         body: formData,
       });
