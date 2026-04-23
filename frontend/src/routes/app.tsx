@@ -205,9 +205,10 @@ function AppConsole() {
           <StepConfirm
             region={region}
             scenario={scenario}
+            crop={crop}
             predictions={predictions}
             genotype={genotype ?? {
-              id: "Z-7421", name: "Maize", trait: "Drought-tolerant",
+              id: "N/A", name: crop || "Crop", trait: "Not selected",
               yield: 9.4, risk: 0.12, water: 0.78, confidence: 0.947,
             }}
             onBack={() => setStep("results")}

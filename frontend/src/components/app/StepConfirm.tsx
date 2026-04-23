@@ -11,10 +11,11 @@ type PredictionItem = {
 };
 
 export function StepConfirm({
-  region, scenario, genotype, predictions = [], onBack, onRestart,
+  region, scenario, crop, genotype, predictions = [], onBack, onRestart,
 }: {
   region: Region;
   scenario: Scenario;
+  crop: string;
   genotype: Genotype;
   predictions?: PredictionItem[];
   onBack: () => void;
@@ -59,9 +60,14 @@ export function StepConfirm({
         body: JSON.stringify({
           region: region.name,
           scenario: scenario.name,
-          crop: genotype.name,
+          crop,
+          genotype_id: bestPrediction.id,
           yield: Number(bestPrediction.yield_estimate.toFixed(2)),
           confidence: Number(bestPrediction.confidence.toFixed(2)),
+          prediction_values: {
+            yield: Number(bestPrediction.yield_estimate.toFixed(2)),
+            confidence: Number(bestPrediction.confidence.toFixed(2)),
+          },
           temperature: `+${scenario.temperatureDelta.toFixed(1)}°C`,
           rainfall: `${scenario.rainfallChange.toFixed(0)}%`,
           co2: `${scenario.co2} ppm`,

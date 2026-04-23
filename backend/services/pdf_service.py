@@ -1,8 +1,12 @@
 from html import escape
+import logging
 import os
 import shutil
 
 import pdfkit
+
+
+logger = logging.getLogger(__name__)
 
 
 def _safe_text(value: object, max_len: int) -> str:
@@ -23,9 +27,13 @@ def generate_html(data: dict) -> str:
     region = _safe_text(data.get("region", "N/A"), 48)
     scenario = _safe_text(data.get("scenario", "N/A"), 56)
     crop = _safe_text(data.get("crop", "N/A"), 30)
+    genotype_id = _safe_text(data.get("genotype_id", "N/A"), 40)
 
     yield_value = data.get("yield", data.get("yield_value", "N/A"))
     confidence = data.get("confidence", "N/A")
+    prediction_values = data.get("prediction_values", {})
+    predicted_yield = prediction_values.get("yield", yield_value)
+    predicted_confidence = prediction_values.get("confidence", confidence)
 
     temperature = _safe_text(data.get("temperature", data.get("temp", "N/A")), 20)
     rainfall = _safe_text(data.get("rainfall", data.get("rain", "N/A")), 20)
@@ -57,6 +65,12 @@ def generate_html(data: dict) -> str:
         )
 
     confidence_pct = f"{float(confidence) * 100:.1f}%" if isinstance(confidence, (float, int)) else _safe_text(confidence, 20)
+    predicted_yield_label = f"{float(predicted_yield):.2f} t/ha" if isinstance(predicted_yield, (float, int)) else _safe_text(predicted_yield, 24)
+    predicted_confidence_pct = (
+        f"{float(predicted_confidence) * 100:.1f}%"
+        if isinstance(predicted_confidence, (float, int))
+        else _safe_text(predicted_confidence, 20)
+    )
     if isinstance(yield_value, (int, float)):
         yield_label = f"{yield_value:.2f} t/ha"
     else:
@@ -123,8 +137,24 @@ def generate_html(data: dict) -> str:
       <td style=\"padding:9px 14px; font-size:12px; color:#ffffff; border-bottom:1px solid #1e293b;\">{scenario}</td>
     </tr>
     <tr>
+      <td style=\"padding:9px 14px; font-size:12px; color:#64748b; border-bottom:1px solid #1e293b;\">Genotype ID</td>
+      <td style=\"padding:9px 14px; font-size:12px; color:#ffffff; border-bottom:1px solid #1e293b;\">{genotype_id}</td>
+    </tr>
+    <tr>
       <td style=\"padding:9px 14px; font-size:12px; color:#64748b;\">Crop</td>
       <td style=\"padding:9px 14px; font-size:12px; color:#22c55e; font-weight:700;\">{crop}</td>
+    </tr>
+  </table>
+
+  <p style=\"margin:0 0 8px 0; font-size:10px; color:#22c55e; letter-spacing:3px; text-transform:uppercase; font-weight:700;\">Prediction Values</p>
+  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"border-collapse:collapse; background:#111827; border:1px solid #1e293b; margin-bottom:16px;\">
+    <tr>
+      <td style=\"padding:9px 14px; font-size:12px; color:#64748b; width:140px; border-bottom:1px solid #1e293b;\">Predicted Yield</td>
+      <td style=\"padding:9px 14px; font-size:12px; color:#ffffff; border-bottom:1px solid #1e293b;\">{predicted_yield_label}</td>
+    </tr>
+    <tr>
+      <td style=\"padding:9px 14px; font-size:12px; color:#64748b;\">Predicted Confidence</td>
+      <td style=\"padding:9px 14px; font-size:12px; color:#ffffff;\">{predicted_confidence_pct}</td>
     </tr>
   </table>
 
@@ -177,6 +207,16 @@ def generate_html(data: dict) -> str:
 
 
 def generate_blueprint_pdf(data: dict) -> bytes:
+    logger.info(
+        "Generating PDF with crop=%s region=%s scenario=%s genotype_id=%s yield=%s confidence=%s",
+        data.get("crop"),
+        data.get("region"),
+        data.get("scenario"),
+        data.get("genotype_id"),
+        data.get("yield"),
+        data.get("confidence"),
+    )
+
     html = generate_html(data)
     options = {
         "page-size": "A4",
